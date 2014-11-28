@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script>
+  
+    // Set up the scene, camera, and renderer as global variables.
+    var scene, camera, renderer;
+
+    init();
+    animate();
+
+    // Sets up the scene.
+    function init() {
+
+      // Create the scene and set the scene size.
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0xffffff, 0.08);
+      scene.fog.color.setHSL( 0.1, 0.6, 0.6 );
+      var WIDTH = window.innerWidth,
+          HEIGHT = window.innerHeight;
+
+      // Create a renderer and add it to the DOM.
+      renderer = new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize(WIDTH, HEIGHT);
+      document.body.appendChild(renderer.domElement);
+
+      // Create a camera, zoom it out from the model a bit, and add it to the scene.
+      camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 10000);
+      camera.position.set(-1,1.5,16);
+      scene.add(camera);
+
+      // Create an event listener that resizes the renderer with the browser window.
+      window.addEventListener('resize', function() {
+        var WIDTH = window.innerWidth,
+            HEIGHT = window.innerHeight;
+        renderer.setSize(WIDTH, HEIGHT);
+        camera.aspect = WIDTH / HEIGHT;
+        camera.updateProjectionMatrix();
+      });
+
+      // Set the background color of the scene.
+      renderer.setClearColorHex(0xFFC48A);
+
+      // Create a light, set its position, and add it to the scene.
+      var light = new THREE.PointLight(0xffffff);
+      light.position.set(-100,200,100);
+      scene.add(light);
+
+
+	  var floorTexture = new THREE.ImageUtils.loadTexture('img/sand_02.JPG');
+  	  floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+      floorTexture.repeat.set(100,100);
+      floorTexture.anisotropy = 32;
+
+      var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, color: this.textureGround ? 0xffffff : 0xaaaaaa, ambient: 0x333333 } );
+	  var plane = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000, 10, 10), floorMaterial);
+      plane.overdraw = true;
+      plane.rotation.x = - Math.PI/2;
+      plane.position.set(1.5, -0.26, 1);
+      scene.add(plane);
+
+	  var hemisphere = new THREE.HemisphereLight(0x222222);
+      scene.add(hemisphere)
+	  	
+		
+      // Load in the mesh and add it to the scene.
+      var material = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('img/pyramid_material.png')
+      });
+      
+      
+  /*var boxTexture = new THREE.ImageUtils.loadTexture( "img/desert.png" );
+  var material = new THREE.MeshLambertMaterial({ emissive:0x505050, map: boxTexture, color: 0xffffff});
+  
+  var height = 2 * 100+10;
+  var width = 4*0.4 * 20 + 2;
+  var box = new THREE.Mesh( new THREE.CubeGeometry(width, height, width), material);
+  box.position.set(0.1 * 1000 - 200, 0.3/2 ,0.2 * 1000 - 500);
+  //box.rotation.set(0, 0.3 * Math.PI * 2, 0);
+  scene.add(box);*/
+                
+      // pyramid
+      var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0, 1.5, 1.5, 4, false), material);
+      cylinder.overdraw = true;
+      cylinder.rotation.x = 0;
+      scene.add(cylinder);
+      cylinder.position.set(1.5, 0.5, 1);
+
+      // Add OrbitControls so that we can pan around with the mouse.
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+	  controls.maxPolarAngle = Math.PI/2;
+    }
+
+
+    // Renders the scene and updates the render as needed.
+    function animate() {
+
+      // Read more about requestAnimationFrame at http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
+      requestAnimationFrame(animate);
+      
+      // Render the scene.
+      renderer.render(scene, camera);
+      controls.update();
+
+    }
+    </script>
+  </body>
+</html>      
